@@ -1,8 +1,10 @@
+import 'dart:convert';
 import 'package:covid_19/constant.dart';
 import 'package:covid_19/widgets/counter.dart';
 import 'package:covid_19/widgets/my_header.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:http/http.dart' as http;
 import 'package:flutter_svg/flutter_svg.dart';
 
 var now = new DateTime.now();
@@ -39,10 +41,21 @@ class _HomeScreenState extends State<HomeScreen> {
   final controller = ScrollController();
   double offset = 0;
 
+  Map country_data;
+  fetch_country_data() async {
+    http.Response response = await http.get('https://disease.sh/v2/countries/india');
+    setState(() {
+      if(response != null)
+        country_data = json.decode(response.body);
+    });
+  }
+
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    fetch_country_data();
     controller.addListener(onScroll);
   }
 
@@ -132,53 +145,58 @@ class _HomeScreenState extends State<HomeScreen> {
                       children: <Widget>[
                         Counter(
                           color: kInfectedColor,
-                          number: 1046,
+                          number: country_data['cases'],
                           title: "Infected",
                         ),
                         Counter(
                           color: kDeathColor,
-                          number: 87,
+                          number: country_data['deaths'],
                           title: "Deaths",
                         ),
                         Counter(
                           color: kRecovercolor,
-                          number: 46,
+                          number: country_data['deaths'],
                           title: "Recovered",
                         ),
                       ],
                     ),
                   ),
                   SizedBox(height: 20),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
-                      Text(
-                        "Global spread of Virus",
-                        style: kTitleTextstyle,
-                      ),                      
-                    ],
-                  ),
                   Container(
-                    margin: EdgeInsets.only(top: 20),
                     padding: EdgeInsets.all(20),
-                    height: 178,
-                    width: double.infinity,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(20),
                       color: Colors.white,
                       boxShadow: [
                         BoxShadow(
-                          offset: Offset(0, 10),
+                          offset: Offset(0, 4),
                           blurRadius: 30,
                           color: kShadowColor,
                         ),
                       ],
                     ),
-                    child: Image.asset(
-                      "assets/images/map.png",
-                      fit: BoxFit.contain,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        Counter(
+                          color: kInfectedColor,
+                          number: country_data['active'],
+                          title: "Active",
+                        ),
+                        Counter(
+                          color: kDeathColor,
+                          number: country_data['todayCases'],
+                          title: "Today Cases",
+                        ),
+                        Counter(
+                          color: kRecovercolor,
+                          number: country_data['todayDeaths'],
+                          title: "Today Deaths",
+                        ),
+                      ],
                     ),
                   ),
+                  
                 ],
               ),
             ),
