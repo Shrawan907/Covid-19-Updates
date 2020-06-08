@@ -2,7 +2,13 @@ import 'package:covid_19/constant.dart';
 import 'package:covid_19/widgets/counter.dart';
 import 'package:covid_19/widgets/my_header.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+
+var now = new DateTime.now();
+var newFormat = DateFormat.yMMMMd('en_US');
+String date = newFormat.format(now);
+
 
 void main() => runApp(MyApp());
 
@@ -68,39 +74,21 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             Container(
               margin: EdgeInsets.symmetric(horizontal: 20),
+              
               padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
               height: 60,
               width: double.infinity,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(25),
-                border: Border.all(
-                  color: Color(0xFFE5E5E5),
-                ),
-              ),
+              
               child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  SvgPicture.asset("assets/icons/maps-and-flags.svg"),
-                  SizedBox(width: 20),
-                  Expanded(
-                    child: DropdownButton(
-                      isExpanded: true,
-                      underline: SizedBox(),
-                      icon: SvgPicture.asset("assets/icons/dropdown.svg"),
-                      value: "Indonesia",
-                      items: [
-                        'Indonesia',
-                        'Bangladesh',
-                        'United States',
-                        'Japan'
-                      ].map<DropdownMenuItem<String>>((String value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Text(value),
-                        );
-                      }).toList(),
-                      onChanged: (value) {},
-                    ),
+                  Text(
+                    'INDIA',
+                    style: TextStyle(
+                      fontSize: 30,
+                      color: Colors.blue
+                    )
+
                   ),
                 ],
               ),
@@ -112,29 +100,16 @@ class _HomeScreenState extends State<HomeScreen> {
                 children: <Widget>[
                   Row(
                     children: <Widget>[
-                      RichText(
-                        text: TextSpan(
-                          children: [
-                            TextSpan(
-                              text: "Case Update\n",
-                              style: kTitleTextstyle,
-                            ),
-                            TextSpan(
-                              text: "Newest update March 28",
-                              style: TextStyle(
-                                color: kTextLightColor,
-                              ),
-                            ),
-                          ],
-                        ),
+                      Text(
+                        "Case Updates",
+                        style: kTitleTextstyle,
                       ),
                       Spacer(),
                       Text(
-                        "See details",
+                        "$date",
                         style: TextStyle(
-                          color: kPrimaryColor,
-                          fontWeight: FontWeight.w600,
-                        ),
+                                color: kTextLightColor,
+                              ),
                       ),
                     ],
                   ),
@@ -178,16 +153,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
                       Text(
-                        "Spread of Virus",
+                        "Global spread of Virus",
                         style: kTitleTextstyle,
-                      ),
-                      Text(
-                        "See details",
-                        style: TextStyle(
-                          color: kPrimaryColor,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
+                      ),                      
                     ],
                   ),
                   Container(
