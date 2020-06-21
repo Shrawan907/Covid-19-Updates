@@ -135,6 +135,7 @@ List getOtherCountrydata()  {
 List getStatesList() {
   print("getStatesList");
   if(statesData.isNotEmpty) {
+    stateNames = [];
     statesData.forEach((key, value) {
       if(key == "statewise") {
           List list = statesData[key];
