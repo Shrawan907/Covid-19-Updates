@@ -1,16 +1,11 @@
-import 'dart:convert';
-import 'package:covid_19/constant.dart';
-import 'package:covid_19/widgets/counter.dart';
-import 'package:covid_19/widgets/my_header.dart';
+import 'package:covid_19/resources/constant.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'package:http/http.dart' as http;
-import 'package:flutter_svg/flutter_svg.dart';
-
-var now = new DateTime.now();
-var newFormat = DateFormat.yMMMMd('en_US');
-String date = newFormat.format(now);
-
+import 'package:covid_19/screens/home_screen.dart';
+import 'package:covid_19/screens/dataScreen.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:covid_19/screens/fastQ.dart';
+import 'package:covid_19/resources/dataSource.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 void main() => runApp(MyApp());
 
@@ -18,6 +13,7 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Covid 19',
@@ -27,182 +23,100 @@ class MyApp extends StatelessWidget {
           textTheme: TextTheme(
             body1: TextStyle(color: kBodyTextColor),
           )),
-      home: HomeScreen(),
+      home: Page(),
     );
   }
 }
 
-class HomeScreen extends StatefulWidget {
+
+
+Map countryData;
+Map globalData;
+
+class Page extends StatefulWidget {
   @override
-  _HomeScreenState createState() => _HomeScreenState();
+  _PageState createState() => _PageState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
-  final controller = ScrollController();
-  double offset = 0;
+class _PageState extends State<Page> {
+  bool search = true;
+  PageController pageController;
+  int pageIndex = 0;
 
-  Map country_data;
-  fetch_country_data() async {
-    http.Response response = await http.get('https://disease.sh/v2/countries/india');
+  Future fetchData() async {
+    await fetchThisData();
     setState(() {
-      if(response != null)
-        country_data = json.decode(response.body);
+      search = false;
     });
-  }
-
+  }  
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    fetch_country_data();
-    controller.addListener(onScroll);
+      fetchData();
+    pageController = PageController();
   }
 
   @override
   void dispose() {
-    // TODO: implement dispose
-    controller.dispose();
+    pageController.dispose();
     super.dispose();
   }
 
-  void onScroll() {
+  onPageChanged(int pageIndex) {
     setState(() {
-      offset = (controller.hasClients) ? controller.offset : 0;
+      this.pageIndex = pageIndex;
     });
   }
 
+  onTap(int pageIndex) {
+    pageController.animateToPage(
+      pageIndex,
+      duration: Duration(milliseconds: 250),
+      curve: Curves.easeInOut
+    );
+  }
+
+  Widget buildScreen() {
+    return search ? Scaffold(body: Column(
+      mainAxisAlignment: MainAxisAlignment.center,  
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: <Widget>[
+        SpinKitThreeBounce(color: Colors.blueAccent, size: 25,),
+        Text("Check all cases at one place",style: TextStyle(color: kBodyTextColor, fontFamily: "Poppins")),
+      ],
+    )) : Scaffold(
+      body: PageView(
+        children: <Widget>[
+          HomeScreen(),
+          DropDown(),
+          FAQPage()
+        ],
+        controller: pageController,
+        onPageChanged: onPageChanged,
+        physics: NeverScrollableScrollPhysics(),
+      ),
+      bottomNavigationBar: CupertinoTabBar(
+        currentIndex: pageIndex,
+        onTap: onTap,
+        activeColor: Theme.of(context).primaryColor,
+        items: [
+          BottomNavigationBarItem(icon: Icon(Icons.home),),
+          BottomNavigationBarItem(icon: Icon(Icons.insert_chart),),
+          BottomNavigationBarItem(icon: Icon(Icons.question_answer),),
+        ],
+      )
+    );
+//    return RaisedButton(
+//      child: Text('Logout'),
+//      onPressed: logout,
+//    );
+  }
+
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SingleChildScrollView(
-        controller: controller,
-        child: Column(
-          children: <Widget>[
-            MyHeader(
-              image: "assets/icons/Drcorona.svg",
-              textTop: "All you need",
-              textBottom: "is stay at home.",
-              offset: offset,
-            ),
-            Container(
-              margin: EdgeInsets.symmetric(horizontal: 20),
-              
-              padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-              height: 60,
-              width: double.infinity,
-              
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Text(
-                    'INDIA',
-                    style: TextStyle(
-                      fontSize: 30,
-                      color: Colors.blue
-                    )
+    return buildScreen();
 
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(height: 20),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20),
-              child: Column(
-                children: <Widget>[
-                  Row(
-                    children: <Widget>[
-                      Text(
-                        "Case Updates",
-                        style: kTitleTextstyle,
-                      ),
-                      Spacer(),
-                      Text(
-                        "$date",
-                        style: TextStyle(
-                                color: kTextLightColor,
-                              ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 20),
-                  Container(
-                    padding: EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20),
-                      color: Colors.white,
-                      boxShadow: [
-                        BoxShadow(
-                          offset: Offset(0, 4),
-                          blurRadius: 30,
-                          color: kShadowColor,
-                        ),
-                      ],
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        Counter(
-                          color: kInfectedColor,
-                          number: country_data['cases'],
-                          title: "Infected",
-                        ),
-                        Counter(
-                          color: kDeathColor,
-                          number: country_data['deaths'],
-                          title: "Deaths",
-                        ),
-                        Counter(
-                          color: kRecovercolor,
-                          number: country_data['deaths'],
-                          title: "Recovered",
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(height: 20),
-                  Container(
-                    padding: EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20),
-                      color: Colors.white,
-                      boxShadow: [
-                        BoxShadow(
-                          offset: Offset(0, 4),
-                          blurRadius: 30,
-                          color: kShadowColor,
-                        ),
-                      ],
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        Counter(
-                          color: kInfectedColor,
-                          number: country_data['active'],
-                          title: "Active",
-                        ),
-                        Counter(
-                          color: kDeathColor,
-                          number: country_data['todayCases'],
-                          title: "Today Cases",
-                        ),
-                        Counter(
-                          color: kRecovercolor,
-                          number: country_data['todayDeaths'],
-                          title: "Today Deaths",
-                        ),
-                      ],
-                    ),
-                  ),
-                  
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
   }
 }

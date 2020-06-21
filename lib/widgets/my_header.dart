@@ -1,7 +1,10 @@
-import 'package:covid_19/constant.dart';
-import 'package:covid_19/info_screen.dart';
+import 'package:covid_19/resources/constant.dart';
+import 'package:covid_19/screens/info_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:path/path.dart';
+
+
 
 class MyHeader extends StatefulWidget {
   final String image;
@@ -43,14 +46,23 @@ class _MyHeaderState extends State<MyHeader> {
           children: <Widget>[
             GestureDetector(
               onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) {
-                      return InfoScreen();
-                    },
-                  ),
-                );
+                var route = ModalRoute.of(context);
+                if(route!=null){
+                  print(route.settings.name);
+                  if(route.settings.name!=null) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) {
+                          return InfoScreen();
+                        },
+                      ),
+                    );
+                  }
+                  else {
+                    Navigator.pop(context);
+                  }
+                }
               },
               child: SvgPicture.asset("assets/icons/menu.svg"),
             ),
@@ -77,7 +89,6 @@ class _MyHeaderState extends State<MyHeader> {
                       ),
                     ),
                   ),
-                  Container(), // I dont know why it can't work without container
                 ],
               ),
             ),

@@ -1,8 +1,8 @@
-import 'package:covid_19/constant.dart';
+import 'package:covid_19/resources/constant.dart';
 import 'package:flutter/material.dart';
 
 class Counter extends StatelessWidget {
-  final int number;
+  final String number;
   final Color color;
   final String title;
   const Counter({
