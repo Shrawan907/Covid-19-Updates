@@ -363,7 +363,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       width: double.infinity,
                       child: Center(child: Text("Do Star this 🙂", style: TextStyle(fontSize: 18))),
                     ),
-                    onTap: () {_launchInBrowser('https://github.com/Shrawan907/Covid-19-Flutter-UI');},
+                    onTap: () {_launchInBrowser('https://github.com/Shrawan907/Covid-19-Updates');},
                   ),
                             ],
                           ),
